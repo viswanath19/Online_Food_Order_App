@@ -6,6 +6,8 @@ import * as Location from 'expo-location'
 
 
 import { useNavigation } from '../utils'
+import { HomeScreen } from './HomeScreen'
+import { add } from 'react-native-reanimated'
 
 
 const screenWidth = Dimensions.get('screen').width
@@ -32,32 +34,39 @@ export const LandingScreen = () => {
 
             let location: any = await Location.getCurrentPositionAsync({});
 
-            const { coords } = location
+            const { coords } = location;
+            console.log("coords",coords);
 
             if(coords){
 
                 const { latitude, longitude} = coords;
-
-                let addressResponse: any = await Location.reverseGeocodeAsync({ latitude, longitude})
-
-                for(let item of addressResponse){
-                    setAddress(item)
-                    let currentAddress = `${item.name},${item.street}, ${item.postalCode}, ${item.country}`
-                    setDisplayAddress(currentAddress)
-
-                    if(currentAddress.length > 0){
-                        setTimeout(() =>{
-                            navigate('homeStack')
-                        }, 2000)
+                try {
+                    let addressResponse: any = await Location.reverseGeocodeAsync({ latitude, longitude})
+                    console.log("address Response",addressResponse);
+    
+                    for(let item of addressResponse){
+                        setAddress(item)
+                        let currentAddress = `${item.name},${item.city}, ${item.postalCode}, ${item.country}`
+                        setDisplayAddress(currentAddress)
+    
+                        if(currentAddress.length > 0){
+                            setTimeout(() =>{
+                                navigate('homeStack')
+                            }, 2000)
+                        }
+    
+    
+                        return;
                     }
-
-
-                    return;
                 }
-
+                catch(e){
+                   console.log("Yup")
+                   navigate('homeStack');
+                }
 
             }else{
                 //notify user something went wrong with location
+                return <HomeScreen />
             }
 
         })();
